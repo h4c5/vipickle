@@ -1,0 +1,25 @@
+# IDE
+.idea
+.vscode
+
+# pycache
+__pycache__
+*.pyc
+
+# Virtualenv and local
+.venv
+
+# Tests
+.coverage
+
+# Packaging
+dist/**
+build/**
+**/*egg-info*
+_version.py
+
+# logs
+*.log
+
+# doc
+site
