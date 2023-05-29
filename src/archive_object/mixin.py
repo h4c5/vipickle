@@ -67,15 +67,14 @@ class MetaArchivable(type):
         if not attributes.get("PICKLE_NAME"):
             attributes["PICKLE_NAME"] = f"{name.lower()}.pkl"
 
-        for prefix in ("PICKLE", "CONFIG"):
-            # If the class has a {prefix}_BLACKLIST attribute, it will be used as it is
+        for prefix in ("PICKLE_BLACKLIST", "CONFIG_ITEMS"):
+            # If the class has a prefix attribute, it will be used as it is
             # we convert it to a set to prevent duplicated values
-            if f"{prefix}_BLACKLIST" in attributes:
-                pickle_blacklist = {key for key in attributes[f"{prefix}_BLACKLIST"]}
+            if prefix in attributes:
+                pickle_blacklist = {key for key in attributes[prefix]}
 
-            # Otherwise the {prefix}_BLACKLIST attribute will be created from the parent
-            # classes {prefix}_BLACKLIST attributes and the {prefix}_BLACKLIST_ADD and
-            # {prefix}_BLACKLIST_REMOVE attributes
+            # Otherwise the prefix attribute will be created from the parent classes
+            # prefix attributes and the {prefix}_ADD and {prefix}_REMOVE attributes
             else:
                 pickle_blacklist = set()
 
@@ -83,20 +82,20 @@ class MetaArchivable(type):
                 for parent in parents:
                     if issubclass(parent, Archivable):
                         pickle_blacklist = pickle_blacklist.union(
-                            getattr(parent, f"{prefix}_BLACKLIST", set())
+                            getattr(parent, prefix, set())
                         )
 
-                # Then we add attributes from {prefix}_BLACKLIST_ADD
+                # Then we add attributes from {prefix}_ADD
                 pickle_blacklist = pickle_blacklist.union(
-                    attributes.get(f"{prefix}_BLACKLIST_ADD", set())
+                    attributes.get(f"{prefix}_ADD", set())
                 )
-                # and we remove attributes from {prefix}_BLACKLIST_REMOVE
+                # and we remove attributes from {prefix}_REMOVE
                 pickle_blacklist = pickle_blacklist.difference(
-                    attributes.get(f"{prefix}_BLACKLIST_REMOVE", set())
+                    attributes.get(f"{prefix}_REMOVE", set())
                 )
 
-            # Finnaly, {prefix}_BLACKLIST is converted to a tuple for immutablity
-            attributes[f"{prefix}_BLACKLIST"] = tuple(sorted(pickle_blacklist))
+            # Finnaly, {prefix} is converted to a tuple for immutablity
+            attributes[prefix] = tuple(sorted(pickle_blacklist))
 
         return super().__new__(cls, name, parents, attributes)
 
@@ -183,7 +182,7 @@ class Archivable(metaclass=MetaArchivable):
         with open(path / self.CONFIG_NAME, "w") as f:
             json.dump(self.configurations, f, indent=indent, cls=cls, **kwargs)
 
-    def save_pickle_blacklisted(self, path: Union[str, Path]) -> Dict[Exception]:
+    def save_pickle_blacklisted(self, path: Union[str, Path]) -> Dict[str, Exception]:
         """Try to save excluded attributes
 
         Args:
@@ -270,13 +269,15 @@ class Archivable(metaclass=MetaArchivable):
         obj.after_load()
         return obj
 
-    def before_load(self):
+    @classmethod
+    def before_load(cls):
         """Hook executed at the beggining of the load method"""
 
-    def after_load(self):
+    @classmethod
+    def after_load(cls):
         """Hook executed at the end of the load method"""
 
-    def load_pickle_blacklisted(self, path: Union[str, Path]) -> Dict[Exception]:
+    def load_pickle_blacklisted(self, path: Union[str, Path]) -> Dict[str, Exception]:
         """Try to unpickle excluded attributes"""
         failures = {}
         for attribute in self.PICKLE_BLACKLIST:
