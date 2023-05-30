@@ -1,59 +1,73 @@
 [build-system]
-requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
+requires = ["setuptools>=65", "setuptools_scm[toml]>=7"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "archive-object"
-description = "archive-object description"
+name = "blackpickle"
+description = "BlackPickle is a tiny python package for saving instances with unpickable attributes"
 authors = [
     { name = "Hakim Cheikh", email = "hakimcheikh@yahoo.fr" },
 ]
 license = { file = "LICENSE" }
 readme = "README.md"
 requires-python = ">=3.8,<4.0"
-dependencies = []
+dependencies = ["loguru"]
 dynamic = ["version"]
 
 [project.urls]
-# homepage = ""
-# documentation = ""
-# repository = ""
-# "Bug Tracker" = ""
+homepage = "https://github.com/h4c5/blackpickle"
+documentation = "https://github.com/h4c5/blackpickle"
+repository = "https://github.com/h4c5/blackpickle"
+"Bug Tracker" = "https://github.com/h4c5/blackpickle"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools_scm]
-write_to = "src/archive_object/_version.py"
+write_to = "src/blackpickle/_version.py"
 
 [project.optional-dependencies]
 dev = [
     "black",
     "ruff",
-    "bandit",
+    "bandit[toml]",
     "pytest>=7.0",
     "pytest-cov>=3.0",
     "pytest-datadir>=1.0",
+    "numpy"
 ]
 test = [
     "pytest>=7.0",
     "pytest-cov>=3.0",
     "pytest-datadir>=1.0",
     "nox>=2022",
+    "numpy"
 ]
 doc = [
-    "mkdocs-material>=8.0,<9.0",
+    "mkdocs-material>=8.0",
     "mkdocstrings[python]",
     "mkdocs-gen-files",
     "mkdocs-literate-nav",
     "mkdocs-section-index",
 ]
 
+[project.scripts]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-v --cov=archive_object --cov-fail-under=80 --cov-config=.coveragerc"
+addopts = "-v --cov=blackpickle --cov-fail-under=80 --cov-config=.coveragerc"
 
-[tool.isort]
-profile = "black"
+[tool.ruff]
+src = ["src"]
+select = [
+    "E",
+    "F",
+    # "D",
+]
 
-[project.scripts]
+[tool.ruff.pydocstyle]
+convention = "google"
+
+[tool.bandit]
+exclude_dirs = ["tests"]
+skips = ["B403", "B301"] # skip pickle related issues

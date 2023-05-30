@@ -5,38 +5,11 @@ from typing import Dict, Iterable, Union
 
 from loguru import logger
 
-from .utils import NumpyJSONEncoder
+from .errors import DumpAttributeError, RestoreAttributeError
+from .save_utils import NumpyJSONEncoder, create_folder
 
-
-def create_folder(
-    path: Union[str, Path], exist_ok: bool = True, parents: bool = True
-) -> Path:
-    """Create a folder if it does not exists and returns it
-
-    Args:
-        path (Union[str, Path]): Path to the folder
-        exist_ok (bool, optional): If False raise an error if the folder already exists.
-            Defaults to True.
-        parents (bool, optional): If True, also creates parent folders.
-            Defaults to True.
-
-    Returns:
-        Path: _description_
-    """
-    if isinstance(path, str):
-        path = Path(path)
-
-    path.mkdir(exist_ok=exist_ok, parents=parents)
-
-    return path
-
-
-class DumpAttributeError(Exception):
-    ...
-
-
-class RestoreAttributeError(Exception):
-    ...
+DUMP_METHOD_PATTERN = "_dump_{}_"
+RESTORE_METHOD_PATTERN = "_restore_{}_"
 
 
 class MetaArchivable(type):
@@ -59,14 +32,6 @@ class MetaArchivable(type):
         Returns:
             class: a new class
         """
-        # We set a default value for CONFIG_NAME if the attribute does not exists
-        if not attributes.get("CONFIG_NAME"):
-            attributes["CONFIG_NAME"] = "config.json"
-
-        # We set a default value for PICKLE_NAME if the attribute does not exists
-        if not attributes.get("PICKLE_NAME"):
-            attributes["PICKLE_NAME"] = f"{name.lower()}.pkl"
-
         for prefix in ("PICKLE_BLACKLIST", "CONFIG_ITEMS"):
             # If the class has a prefix attribute, it will be used as it is
             # we convert it to a set to prevent duplicated values
@@ -101,18 +66,23 @@ class MetaArchivable(type):
 
 
 class Archivable(metaclass=MetaArchivable):
-    PICKLE_NAME: str = None
+    PICKLE_NAME: str = "archive.pkl"
     PICKLE_BLACKLIST: Iterable[str] = ()
     PICKLE_BLACKLIST_ADD: Iterable[str] = ()
     PICKLE_BLACKLIST_REMOVE: Iterable[str] = ()
 
-    CONFIG_NAME: str = None
+    CONFIG_NAME: str = "config.json"
     CONFIG_ITEMS: Iterable[str] = ()
     CONFIG_ITEMS_ADD: Iterable[str] = ()
     CONFIG_ITEMS_REMOVE: Iterable[str] = ()
 
     @property
     def configurations(self) -> dict:
+        """A configuration dict used to show important attributes
+
+        Returns:
+            dict: configuration dict
+        """
         return {
             key: getattr(self, key) for key in self.CONFIG_ITEMS if hasattr(self, key)
         }
@@ -130,7 +100,18 @@ class Archivable(metaclass=MetaArchivable):
         path: Union[str, Path],
         pickle_dump_kwargs: dict = None,
         json_dump_kwargs: dict = None,
+        overwrite: bool = True,
     ):
+        """Save the object instance in a dedicated directory
+
+        Args:
+            path (Union[str, Path]): Path to the directory
+            pickle_dump_kwargs (dict, optional): kwargs to be passed to
+                pickle.dump method. Defaults to None.
+            json_dump_kwargs (dict, optional): kwargs to be passed to json.dump method.
+                Defaults to None.
+            overwrite (bool, optional): If True, overwrite the folder if it exists.
+        """
         # Before save hook
         self.before_save()
 
@@ -142,9 +123,9 @@ class Archivable(metaclass=MetaArchivable):
         if json_dump_kwargs is None:
             json_dump_kwargs = {}
 
-        self.save_instance(path, **json_dump_kwargs)
-        self.save_config(path, **json_dump_kwargs)
-        self.save_pickle_blacklisted(path)
+        self.save_instance(path, overwrite=overwrite, **json_dump_kwargs)
+        self.save_config(path, overwrite=overwrite, **json_dump_kwargs)
+        self.save_pickle_blacklisted(path, overwrite=overwrite)
 
         # After save hook
         self.after_save()
@@ -155,58 +136,94 @@ class Archivable(metaclass=MetaArchivable):
     def after_save(self):
         """Hook executed at the end of the save method"""
 
-    def save_instance(self, path: Union[str, Path], **kwargs):
+    def save_instance(self, path: Union[str, Path], overwrite: bool = True, **kwargs):
         """Save the current instance
 
         Args:
             path (Union[str, Path]): path to a folder where to save the current instance
+            overwrite (bool, optional): If True, overwrite the folder if it exists.
         """
-        path = create_folder(path)
+        if not self.PICKLE_NAME:
+            logger.info(
+                f"{self.__class__.__name__}.PICKLE_NAME is empty so the instance "
+                f"will not be saved"
+            )
+            return
 
-        with open(path / self.PICKLE_NAME, "wb") as f:
-            pickle.dump(self, f, **kwargs)
+        path = create_folder(path)
+        filepath = path / self.PICKLE_NAME
+
+        if overwrite or not filepath.exists():
+            with open(filepath, "wb") as f:
+                pickle.dump(self, f, **kwargs)
 
     def save_config(
-        self, path: Union[str, Path], indent: int = 2, cls=NumpyJSONEncoder, **kwargs
+        self,
+        path: Union[str, Path],
+        overwrite: bool = True,
+        indent: int = 2,
+        cls: json.JSONEncoder = NumpyJSONEncoder,
+        **kwargs,
     ):
         """Save the instance configuration attributes
 
         Args:
             path (Union[str, Path]): path to a folder where to save the current instance
                 config file
+            overwrite (bool, optional): If True, overwrite the folder if it exists.
             indent (int, optional): JSON indentation. Defaults to 2.
-            cls (_type_, optional): JSON encoder object. Defaults to NumpyJSONEncoder.
+            cls (JSONEncoder, optional): JSON encoder object.
+                Defaults to NumpyJSONEncoder.
         """
+        if not self.CONFIG_NAME:
+            logger.info(
+                f"{self.__class__.__name__}.CONFIG_NAME is empty so the configuration "
+                f"dict will not be saved"
+            )
+            return
+
         path = create_folder(path)
+        filepath = path / self.CONFIG_NAME
 
-        with open(path / self.CONFIG_NAME, "w") as f:
-            json.dump(self.configurations, f, indent=indent, cls=cls, **kwargs)
+        if overwrite or not filepath.exists():
+            with open(filepath, "w") as f:
+                json.dump(self.configurations, f, indent=indent, cls=cls, **kwargs)
 
-    def save_pickle_blacklisted(self, path: Union[str, Path]) -> Dict[str, Exception]:
+    def save_pickle_blacklisted(
+        self, path: Union[str, Path], overwrite: bool = True
+    ) -> Dict[str, Exception]:
         """Try to save excluded attributes
 
         Args:
             path (Union[str, Path]): path to a folder where to save blacklisted
                 attributes
+            overwrite (bool, optional): If True, overwrite the folder if it exists
+        Returns:
+            Dict[str, Exception]: A dictionary of attributes that could not be saved
+                and corresponding exceptions raised
         """
         path = create_folder(path)
         failures = {}
 
         for attribute in self.PICKLE_BLACKLIST:
             try:
-                getattr(self, f"__dump_{attribute}__")(path)
-            except AttributeError as e:
-                logger.debug(
-                    f"self.{attribute} count not be dumped since there is no "
-                    f"method {self.__class__.__name__}.__dump_{attribute}__"
+                getattr(self, DUMP_METHOD_PATTERN.format(attribute))(
+                    path, overwrite=overwrite
                 )
-                failures[attribute] = e
             except DumpAttributeError as e:
                 logger.warning(
-                    f"{self.__class__.__name__}.__dump_{attribute}__ failed : "
+                    f"{self.__class__.__name__}"
+                    f".{DUMP_METHOD_PATTERN.format(attribute)} failed : "
                     f"self.{attribute} could not be dumped"
                 )
                 logger.exception(e)
+                failures[attribute] = e
+            except AttributeError as e:
+                logger.debug(
+                    f"self.{attribute} count not be dumped since there is no "
+                    f"method {self.__class__.__name__}"
+                    f".{DUMP_METHOD_PATTERN.format(attribute)}"
+                )
                 failures[attribute] = e
 
         return failures
@@ -278,23 +295,33 @@ class Archivable(metaclass=MetaArchivable):
         """Hook executed at the end of the load method"""
 
     def load_pickle_blacklisted(self, path: Union[str, Path]) -> Dict[str, Exception]:
-        """Try to unpickle excluded attributes"""
+        """Try to unpickle excluded attributes
+
+        Args:
+            path (Union[str, Path]): Path to the pickle file
+
+        Returns:
+            Dict[str, Exception]: A dictionary of attributes that could not be loaded
+                and corresponding exceptions raised
+        """
         failures = {}
         for attribute in self.PICKLE_BLACKLIST:
             try:
-                getattr(self, f"__restore_{attribute}__")(path)
-            except AttributeError as e:
-                logger.debug(
-                    f"self.{attribute} count not be unpickled since there is no "
-                    f"method {self.__class__.__name__}.__restore_{attribute}__"
-                )
-                failures[attribute] = e
+                getattr(self, RESTORE_METHOD_PATTERN.format(attribute))(path)
             except RestoreAttributeError as e:
                 logger.warning(
-                    f"{self.__class__.__name__}.__restore_{attribute}__ failed : "
+                    f"{self.__class__.__name__}"
+                    f".{RESTORE_METHOD_PATTERN.format(attribute)} failed : "
                     f"self.{attribute} could not be restored"
                 )
                 logger.exception(e)
+                failures[attribute] = e
+            except AttributeError as e:
+                logger.debug(
+                    f"self.{attribute} count not be unpickled since there is no "
+                    f"method {self.__class__.__name__}"
+                    f".{RESTORE_METHOD_PATTERN.format(attribute)}"
+                )
                 failures[attribute] = e
 
         return failures

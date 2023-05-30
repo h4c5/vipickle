@@ -1,6 +1,6 @@
 <div align="center">
-    <img src="https://img.shields.io/pypi/v/archive-object" alt="archive-object package version" />
-    <img src="https://img.shields.io/pypi/pyversions/archive-object" alt="Python supported versions" />
+    <img src="https://img.shields.io/pypi/v/blackpickle" alt="blackpickle package version" />
+    <img src="https://img.shields.io/pypi/pyversions/blackpickle" alt="Python supported versions" />
     <a href="https://github.com/PyCQA/bandit">
         <img src="https://img.shields.io/badge/security-bandit-yellow.svg" alt="Security thanks to bandit package" />
     </a>
@@ -8,6 +8,6 @@
 </div>
 
 <div align="center">
-    <h1>archive-object</h1>
-    <p ><b>Subtitle</b></p>
+    <h1>BlackPickle</h1>
+    <p ><b>Tiny python package for saving instances with unpickable attributes</b></p>
 </div>
