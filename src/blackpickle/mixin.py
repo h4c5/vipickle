@@ -28,9 +28,6 @@ class MetaArchivable(type):
             name (str): Name of the class
             parents (tuple): Parent classes
             attributes (dict): Class attributes
-
-        Returns:
-            class: a new class
         """
         for prefix in ("PICKLE_BLACKLIST", "CONFIG_ITEMS"):
             # If the class has a prefix attribute, it will be used as it is
