@@ -1,6 +1,6 @@
 site_name: BlackPickle
 
-# see 
+# see
 theme:
   name: material
   logo: assets/favicon.ico
@@ -26,8 +26,17 @@ plugins:
   - search
   - gen-files:
       scripts:
-      - docs/gen_ref_pages.py
+        - docs/gen_ref_pages.py
   - literate-nav:
       nav_file: SUMMARY.md
   - section-index
   - mkdocstrings
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences

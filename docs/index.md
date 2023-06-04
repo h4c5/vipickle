@@ -33,6 +33,20 @@ class MyClass(Archivable):
         self.vision_model = models.vgg16()
         self.vision_model.load_state_dict(torch.load(save_dir / "model_weights.pth"))
 
+
+# Create an instance
+obj = Myclass()
+
+# train could modify the model weights
+obj.train()
+
+# we save the instance to a folder, _dump_vision_model_ will dump the weights in the folder
+obj.save("a/folder")
+del obj
+
+# we can then reload the object, _restore_vision_model_ will recreate the attribute vision_model and load the weights
+obj = MyClass.load("a/folder")
+obj.vision_model.eval()
 ```
 
 ## Additionnal dependencies
