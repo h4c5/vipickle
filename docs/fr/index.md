@@ -1,26 +1,20 @@
-<div align="center">
-    <img src="https://img.shields.io/pypi/v/vipickle" alt="vipickle package version" />
-    <img src="https://img.shields.io/pypi/pyversions/vipickle" alt="Python supported versions" />
-    <a href="https://github.com/PyCQA/bandit">
-        <img src="https://img.shields.io/badge/security-bandit-yellow.svg" alt="Security thanks to bandit package" />
-    </a>
-    <img src="https://img.shields.io/badge/formatting-black-black" alt="Black formatting" />
-</div>
+# VIPickle
 
-<div align="center">
-    <h1>vipickle</h1>
-    <p ><b>Tiny python package for saving instances with unpickable attributes</b></p>
-</div>
+VIPicle permet de sauvegarder des instances de classes qui ont des attributs non "picklable".
 
-## Quickstart
+## Démarrage
 
-Install `vipickle` with pip :
+Installation de `vipickle` avec pip :
 
 ```bash
 pip install vipickle
 ```
 
-Then inherit from `Archivable` and define which attribute are not picklable and how they should be dumped and restored.
+Il vous suffit ensuite d'hériter de la classe Archivable `Archivable` et de spécifier les attributs qui ne doivent pas
+être "picklés".
+
+Vous pouvez également spécifier des fonctions de sauvegarder et de chargement alternatives pour ces attributs afin de
+restaurer l'instance.
 
 ```python
 import torch
@@ -60,21 +54,21 @@ obj = MyClass.load("a/folder")
 obj.vision_model.eval()
 ```
 
-## Additionnal dependencies
+## Dépendances optionnelles
 
-#### Dev dependencies
+#### Dépendances de développement
 
 ```bash
 pip install vipickle[dev]
 ```
 
-#### Unit tests dependencies
+#### Dépendances de test
 
 ```bash
 pip install vipickle[test]
 ```
 
-#### Documentation dependencies
+#### Dépendances de documentation
 
 ```bash
 pip install vipickle[doc]

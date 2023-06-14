@@ -1,12 +1,13 @@
-# BlackPickle
+# VIPickle
 
-BlackPickle is tiny python package for saving instances with unpickable attributes and restore them later.
+vipickle is tiny python package for saving instances with unpickable attributes and restore them later.
 
 ## Quickstart
 
-Install `blackpickle` with pip :
+Install `vipickle` with pip :
+
 ```bash
-pip install blackpickle
+pip install vipickle
 ```
 
 Then inherit from `Archivable` and define which attribute are not picklable and how they should be dumped and restored.
@@ -16,7 +17,7 @@ import torch
 from torchvision import models
 from pathlib import Path
 
-from blackpickle import Archivable
+from vipickle import Archivable
 
 class MyClass(Archivable):
     PICKLE_BLACKLIST = ["vision_model"]
@@ -52,16 +53,19 @@ obj.vision_model.eval()
 ## Additionnal dependencies
 
 #### Dev dependencies
+
 ```bash
-pip install blackpickle[dev]
+pip install vipickle[dev]
 ```
 
 #### Unit tests dependencies
+
 ```bash
-pip install blackpickle[test]
+pip install vipickle[test]
 ```
 
 #### Documentation dependencies
+
 ```bash
-pip install blackpickle[doc]
+pip install vipickle[doc]
 ```

@@ -4,7 +4,7 @@ import random
 from pathlib import Path
 
 import pytest
-from blackpickle import mixin
+from vipickle import mixin
 
 
 class CustomArchivableA(mixin.Archivable):

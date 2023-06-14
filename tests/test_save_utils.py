@@ -3,7 +3,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from blackpickle import save_utils
+from vipickle import save_utils
 
 
 def test_create_folder(tmp_path: Path):
@@ -45,4 +45,4 @@ def test_json_encoder(tmp_path: Path):
 
     with pytest.raises(TypeError):
         with open(tmp_path / "fail.json", "w") as f:
-            json.dump({"fail": lambda x : x}, f, cls=save_utils.NumpyJSONEncoder)
+            json.dump({"fail": lambda x: x}, f, cls=save_utils.NumpyJSONEncoder)

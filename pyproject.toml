@@ -3,8 +3,8 @@ requires = ["setuptools>=65", "setuptools_scm[toml]>=7"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "blackpickle"
-description = "BlackPickle is a tiny python package for saving instances with unpickable attributes"
+name = "vipickle"
+description = "vipickle is a tiny python package for saving instances with unpickable attributes"
 authors = [
     { name = "Hakim Cheikh", email = "hakimcheikh@yahoo.fr" },
 ]
@@ -15,16 +15,16 @@ dependencies = ["loguru"]
 dynamic = ["version"]
 
 [project.urls]
-homepage = "https://github.com/h4c5/blackpickle"
-documentation = "https://github.com/h4c5/blackpickle"
-repository = "https://github.com/h4c5/blackpickle"
-"Bug Tracker" = "https://github.com/h4c5/blackpickle"
+homepage = "https://github.com/h4c5/vipickle"
+documentation = "https://github.com/h4c5/vipickle"
+repository = "https://github.com/h4c5/vipickle"
+"Bug Tracker" = "https://github.com/h4c5/vipickle"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools_scm]
-write_to = "src/blackpickle/_version.py"
+write_to = "src/vipickle/_version.py"
 
 [project.optional-dependencies]
 dev = [
@@ -55,7 +55,7 @@ doc = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-v --cov=blackpickle --cov-fail-under=80 --cov-config=.coveragerc"
+addopts = "-v --cov=vipickle --cov-fail-under=80 --cov-config=.coveragerc"
 
 [tool.ruff]
 src = ["src"]

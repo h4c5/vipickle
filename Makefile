@@ -2,7 +2,7 @@ unit-tests:
 	pytest tests
 
 security-report:
-	bandit -c pyproject.toml -r src/blackpickle
+	bandit -c pyproject.toml -r src/vipickle
 
 lint:
 	black src tests
