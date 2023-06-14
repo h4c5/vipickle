@@ -1,11 +1,11 @@
 from .errors import DumpAttributeError, RestoreAttributeError
-from .mixin import Archivable, MetaArchivable
+from .mixin import MetaVIPicklable, VIPicklable
 from .save_utils import create_folder
 
 __all__ = [
     "DumpAttributeError",
     "RestoreAttributeError",
-    "Archivable",
-    "MetaArchivable",
+    "VIPicklable",
+    "MetaVIPicklable",
     "create_folder",
 ]

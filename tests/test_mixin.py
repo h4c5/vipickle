@@ -4,10 +4,11 @@ import random
 from pathlib import Path
 
 import pytest
+
 from vipickle import mixin
 
 
-class CustomArchivableA(mixin.Archivable):
+class CustomVIPicklableA(mixin.VIPicklable):
     PICKLE_BLACKLIST = ["unpickable", "wont_recover"]
 
     def __init__(self, param1: int):
@@ -19,19 +20,19 @@ class CustomArchivableA(mixin.Archivable):
         self.unpickable = lambda x: x * self.param1
 
 
-def test_pickle_CustomArchivableA(tmp_path: Path):
-    """Test to save an instance of CustomArchivableA"""
-    # Creating a random CustomArchivableA instance
+def test_pickle_CustomVIPicklableA(tmp_path: Path):
+    """Test to save an instance of CustomVIPicklableA"""
+    # Creating a random CustomVIPicklableA instance
     param1 = random.randint(1, 100)
-    a = CustomArchivableA(param1)
+    a = CustomVIPicklableA(param1)
     assert a.wont_recover
 
     # Saving it to a temp folder
     a.save(tmp_path)
 
-    # By default, the instance is saved under tmp_path/customarchivablea.pkl
-    a_path = tmp_path / CustomArchivableA.PICKLE_NAME
-    a_config_path = tmp_path / CustomArchivableA.CONFIG_NAME
+    # By default, the instance is saved under tmp_path/customVIPicklablea.pkl
+    a_path = tmp_path / CustomVIPicklableA.PICKLE_NAME
+    a_config_path = tmp_path / CustomVIPicklableA.CONFIG_NAME
 
     assert a_config_path.is_file()
 
@@ -43,29 +44,29 @@ def test_pickle_CustomArchivableA(tmp_path: Path):
         restored_a.unpickable(10)
 
     # But if we reload it completly it is reconstructed by _restore_unpickable_
-    restored_a = CustomArchivableA.load(tmp_path)
+    restored_a = CustomVIPicklableA.load(tmp_path)
     assert restored_a.unpickable(10) == 10 * param1
 
     with pytest.raises(AttributeError):
         restored_a.wont_recover
 
-    # load also work with tmp_path/customarchivablea.pkl
-    restored_a = CustomArchivableA.load(a_path)
+    # load also work with tmp_path/customVIPicklablea.pkl
+    restored_a = CustomVIPicklableA.load(a_path)
     assert restored_a.unpickable(10) == 10 * param1
 
-    # load also work with tmp_path/customarchivablea.
+    # load also work with tmp_path/customVIPicklablea.
     with pytest.raises(FileNotFoundError):
-        CustomArchivableA.load(tmp_path / "b.pkl")
+        CustomVIPicklableA.load(tmp_path / "b.pkl")
 
 
-class CustomArchivableB(CustomArchivableA):
-    """Subclass of CustomArchivableA"""
+class CustomVIPicklableB(CustomVIPicklableA):
+    """Subclass of CustomVIPicklableA"""
 
     PICKLE_BLACKLIST_ADD = ["param3"]
     PICKLE_BLACKLIST_REMOVE = ["wont_recover"]
 
     def __init__(self, param1: int, param2: int, param3: int):
-        super(CustomArchivableB, self).__init__(param1)
+        super(CustomVIPicklableB, self).__init__(param1)
         self.param2 = param2
         self.param3 = param3
         self.unpickable = lambda x: self.param1 * self.param2
@@ -74,12 +75,12 @@ class CustomArchivableB(CustomArchivableA):
         self.unpickable = lambda x: self.param1 * self.param2
 
 
-def test_pickle_CustomArchivableB(tmp_path: Path):
-    # Creating a random CustomArchivableA instance
+def test_pickle_CustomVIPicklableB(tmp_path: Path):
+    # Creating a random CustomVIPicklableA instance
     param1 = random.randint(1, 100)
     param2 = random.randint(1, 100)
     param3 = random.randint(1, 100)
-    b = CustomArchivableB(param1, param2, param3)
+    b = CustomVIPicklableB(param1, param2, param3)
     assert b.wont_recover
     assert b.param1 == param1
     assert b.param2 == param2
@@ -88,9 +89,9 @@ def test_pickle_CustomArchivableB(tmp_path: Path):
     # Saving it to a temp folder
     b.save(tmp_path)
 
-    # We reload it with CustomArchivableA load function, it will work since it is
+    # We reload it with CustomVIPicklableA load function, it will work since it is
     # calling load_instance, load_config and load_pickle_blacklisted internally
-    restored_b = CustomArchivableA.load(tmp_path)
+    restored_b = CustomVIPicklableA.load(tmp_path)
 
     assert restored_b.unpickable(10) == param1 * param2
     assert restored_b.wont_recover
@@ -99,8 +100,8 @@ def test_pickle_CustomArchivableB(tmp_path: Path):
         restored_b.param3
 
 
-class CustomArchivableC(CustomArchivableB):
-    """Subclass of CustomArchivableA"""
+class CustomVIPicklableC(CustomVIPicklableB):
+    """Subclass of CustomVIPicklableA"""
 
     PICKLE_NAME = None
     CONFIG_NAME = ""
@@ -111,8 +112,8 @@ class CustomArchivableC(CustomArchivableB):
             json.dump({"wont_recover": "or maybe not"}, f)
 
 
-def test_pickle_CustomArchivableC(tmp_path: Path):
-    c = CustomArchivableC(1, 2, 3)
+def test_pickle_CustomVIPicklableC(tmp_path: Path):
+    c = CustomVIPicklableC(1, 2, 3)
     c.save(tmp_path)
 
     assert not list(tmp_path.glob("*.pkl"))

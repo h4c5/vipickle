@@ -12,17 +12,17 @@ DUMP_METHOD_PATTERN = "_dump_{}_"
 RESTORE_METHOD_PATTERN = "_restore_{}_"
 
 
-class MetaArchivable(type):
-    """Metaclass for Archivable
+class MetaVIPicklable(type):
+    """Metaclass for VIPicklable
 
-    This metaclass is aimed to be used with Archivable class. It add the functionality
+    This metaclass is aimed to be used with VIPicklable class. It add the functionality
     to inherit attributes from the parent classes. Which is usefull for adding or
     removing attributes from PICKLE_BLACKLIST and CONFIG_ITEMS.
     """
 
     def __new__(cls, name: str, parents: tuple, attributes: dict):
         """Metaclass constructor for CONFIG_ITEMS and PICKLE_BLACKLIST construction of
-        archivables classes
+        VIPicklables classes
 
         Args:
             name (str): Name of the class
@@ -42,7 +42,7 @@ class MetaArchivable(type):
 
                 # First we get the union of all pickle_blacklist of the parents
                 for parent in parents:
-                    if issubclass(parent, Archivable):
+                    if issubclass(parent, VIPicklable):
                         pickle_blacklist = pickle_blacklist.union(
                             getattr(parent, prefix, set())
                         )
@@ -62,7 +62,7 @@ class MetaArchivable(type):
         return super().__new__(cls, name, parents, attributes)
 
 
-class Archivable(metaclass=MetaArchivable):
+class VIPicklable(metaclass=MetaVIPicklable):
     PICKLE_NAME: str = "archive.pkl"
     PICKLE_BLACKLIST: Iterable[str] = ()
     PICKLE_BLACKLIST_ADD: Iterable[str] = ()
@@ -227,8 +227,8 @@ class Archivable(metaclass=MetaArchivable):
         return failures
 
     @classmethod
-    def load_instance(cls, path: Union[str, Path], **kwargs) -> "Archivable":
-        """Load a Archivable instance and all loadable attributes from
+    def load_instance(cls, path: Union[str, Path], **kwargs) -> "VIPicklable":
+        """Load a VIPicklable instance and all loadable attributes from
         a file or folder
 
         Args:
@@ -236,7 +236,7 @@ class Archivable(metaclass=MetaArchivable):
         Raises:
             FileNotFoundError: Pickle file not found
         Returns:
-            Archivable: The instance object
+            VIPicklable: The instance object
         """
         with open(path, "rb") as f:
             return pickle.load(f, **kwargs)
@@ -247,8 +247,8 @@ class Archivable(metaclass=MetaArchivable):
         path: Union[str, Path],
         pickle_dump_kwargs: dict = None,
         json_dump_kwargs: dict = None,
-    ) -> "Archivable":
-        """Load a Archivable instance and all loadable attributes from
+    ) -> "VIPicklable":
+        """Load a VIPicklable instance and all loadable attributes from
         a file or folder
 
         Args:
@@ -256,7 +256,7 @@ class Archivable(metaclass=MetaArchivable):
         Raises:
             FileNotFoundError: Pickle file not found
         Returns:
-            Archivable: The instance object
+            VIPicklable: The instance object
         """
         if isinstance(path, str):
             path = Path(path)

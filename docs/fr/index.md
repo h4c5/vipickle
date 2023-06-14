@@ -10,7 +10,7 @@ Installation de `vipickle` avec pip :
 pip install vipickle
 ```
 
-Il vous suffit ensuite d'hériter de la classe Archivable `Archivable` et de spécifier les attributs qui ne doivent pas
+Il vous suffit ensuite d'hériter de la classe VIPicklable `VIPicklable` et de spécifier les attributs qui ne doivent pas
 être "picklés".
 
 Vous pouvez également spécifier des fonctions de sauvegarder et de chargement alternatives pour ces attributs afin de
@@ -21,9 +21,9 @@ import torch
 from torchvision import models
 from pathlib import Path
 
-from vipickle import Archivable
+from vipickle import VIPicklable
 
-class MyClass(Archivable):
+class MyClass(VIPicklable):
     PICKLE_BLACKLIST = ["vision_model"]
 
     def __init__(self):

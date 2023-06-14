@@ -10,16 +10,16 @@ Install `vipickle` with pip :
 pip install vipickle
 ```
 
-Then inherit from `Archivable` and define which attribute are not picklable and how they should be dumped and restored.
+Then inherit from `VIPicklable` and define which attribute are not picklable and how they should be dumped and restored.
 
 ```python
 import torch
 from torchvision import models
 from pathlib import Path
 
-from vipickle import Archivable
+from vipickle import VIPicklable
 
-class MyClass(Archivable):
+class MyClass(VIPicklable):
     PICKLE_BLACKLIST = ["vision_model"]
 
     def __init__(self):
