@@ -1,6 +1,9 @@
 <div align="center">
     <img src="https://img.shields.io/pypi/v/vipickle" alt="vipickle package version" />
     <img src="https://img.shields.io/pypi/pyversions/vipickle" alt="Python supported versions" />
+    <a href="https://github.com/h4c5/vipickle/actions/workflows/unit-tests.yml">
+        <img src="https://github.com/h4c5/vipickle/actions/workflows/unit-tests.yml/badge.svg" alt="unit tests status" />
+    </a>
     <a href="https://github.com/PyCQA/bandit">
         <img src="https://img.shields.io/badge/security-bandit-yellow.svg" alt="Security thanks to bandit package" />
     </a>

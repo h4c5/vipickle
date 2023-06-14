@@ -1,0 +1,23 @@
+ame: docs
+on:
+    push:
+        branches:
+            - "main"
+            - "*mkdocs*"
+permissions:
+    contents: write
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-python@v4
+              with:
+                  python-version: 3.11
+
+            # Install mkdocs dependencies
+            - run: |
+                  pip install .[doc]
+
+            # Build and deploy
+            - run: mkdocs gh-deploy --force

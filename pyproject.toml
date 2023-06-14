@@ -13,12 +13,20 @@ readme = "README.md"
 requires-python = ">=3.8,<4.0"
 dependencies = ["loguru", "orjson"]
 dynamic = ["version"]
+classifiers = [
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
 
 [project.urls]
 homepage = "https://github.com/h4c5/vipickle"
-documentation = "https://github.com/h4c5/vipickle"
+documentation = "https://h4c5.github.io/vipickle"
 repository = "https://github.com/h4c5/vipickle"
-"Bug Tracker" = "https://github.com/h4c5/vipickle"
+"Bug Tracker" = "https://github.com/h4c5/vipickle/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
