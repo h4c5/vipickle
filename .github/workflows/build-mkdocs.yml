@@ -1,6 +1,10 @@
-ame: docs
+name: Build mkdocs
 on:
     push:
+        paths:
+            - "src/**"
+            - "docs/**"
+            - "mkdocs.yml"
         branches:
             - "main"
             - "*mkdocs*"
