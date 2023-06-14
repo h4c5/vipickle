@@ -1,3 +1,5 @@
+"""vipckle.save_utils tests."""
+
 from pathlib import Path
 
 import pytest
@@ -5,8 +7,7 @@ from vipickle import save_utils
 
 
 def test_create_folder(tmp_path: Path):
-    """Test create_folder function"""
-
+    """Test create_folder function."""
     created_folder = save_utils.create_folder(tmp_path / "a/b/c")
     assert created_folder.is_dir()
 

@@ -1,17 +1,24 @@
+"""vipckle.mixin tests."""
 import json
 import pickle
 import random
 from pathlib import Path
 
 import pytest
-
 from vipickle import mixin
 
 
 class CustomVIPicklableA(mixin.VIPicklable):
+    """Custom VIPicklable object."""
+
     PICKLE_BLACKLIST = ["unpickable", "wont_recover"]
 
     def __init__(self, param1: int):
+        """Initialization.
+
+        Args:
+            param1 (int): a parameter
+        """
         self.param1 = param1
         self.unpickable = lambda x: x * self.param1
         self.wont_recover = "do not dump"
@@ -21,7 +28,7 @@ class CustomVIPicklableA(mixin.VIPicklable):
 
 
 def test_pickle_CustomVIPicklableA(tmp_path: Path):
-    """Test to save an instance of CustomVIPicklableA"""
+    """Test to save an instance of CustomVIPicklableA."""
     # Creating a random CustomVIPicklableA instance
     param1 = random.randint(1, 100)
     a = CustomVIPicklableA(param1)
@@ -60,12 +67,13 @@ def test_pickle_CustomVIPicklableA(tmp_path: Path):
 
 
 class CustomVIPicklableB(CustomVIPicklableA):
-    """Subclass of CustomVIPicklableA"""
+    """Subclass of CustomVIPicklableA."""
 
     PICKLE_BLACKLIST_ADD = ["param3"]
     PICKLE_BLACKLIST_REMOVE = ["wont_recover"]
 
     def __init__(self, param1: int, param2: int, param3: int):
+        """Initialization."""
         super(CustomVIPicklableB, self).__init__(param1)
         self.param2 = param2
         self.param3 = param3
@@ -76,6 +84,7 @@ class CustomVIPicklableB(CustomVIPicklableA):
 
 
 def test_pickle_CustomVIPicklableB(tmp_path: Path):
+    """Test VIPicklable inheritance."""
     # Creating a random CustomVIPicklableA instance
     param1 = random.randint(1, 100)
     param2 = random.randint(1, 100)
@@ -101,7 +110,7 @@ def test_pickle_CustomVIPicklableB(tmp_path: Path):
 
 
 class CustomVIPicklableC(CustomVIPicklableB):
-    """Subclass of CustomVIPicklableA"""
+    """Subclass of CustomVIPicklableA."""
 
     PICKLE_NAME = None
     CONFIG_NAME = ""
@@ -113,6 +122,7 @@ class CustomVIPicklableC(CustomVIPicklableB):
 
 
 def test_pickle_CustomVIPicklableC(tmp_path: Path):
+    """Test an object that is not saved as a pickle."""
     c = CustomVIPicklableC(1, 2, 3)
     c.save(tmp_path)
 
