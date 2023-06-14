@@ -9,6 +9,7 @@ on:
             - "pyproject.toml"
             - "setup.py"
             - "noxfile.py"
+            
     pull_request:
         branches: ["main", "develop"]
         paths:
@@ -17,8 +18,9 @@ on:
             - "pyproject.toml"
             - "setup.py"
             - "noxfile.py"
-    on:
-        workflow_dispatch:
+
+      workflow_dispatch:
+
 jobs:
     tests:
         runs-on: ubuntu-latest
