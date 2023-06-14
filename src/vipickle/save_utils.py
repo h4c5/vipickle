@@ -1,3 +1,7 @@
+"""Saving utilities module.
+
+Module containing utilities functions for saving purpose.
+"""
 from pathlib import Path
 from typing import Union
 
@@ -5,7 +9,7 @@ from typing import Union
 def create_folder(
     path: Union[str, Path], exist_ok: bool = True, parents: bool = True
 ) -> Path:
-    """Create a folder if it does not exists and returns it
+    """Create a folder if it does not exists and returns it.
 
     Args:
         path (Union[str, Path]): Path to the folder

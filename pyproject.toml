@@ -62,7 +62,7 @@ src = ["src"]
 select = [
     "E",
     "F",
-    # "D",
+    "D",
 ]
 
 [tool.ruff.pydocstyle]

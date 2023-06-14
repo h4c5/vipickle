@@ -1,3 +1,7 @@
+"""Mixin module.
+
+This module contains the main VIPickable class and its meta class.
+"""
 import pickle
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, Optional, Union
@@ -13,7 +17,7 @@ RESTORE_METHOD_PATTERN = "_restore_{}_"
 
 
 class MetaVIPicklable(type):
-    """Metaclass for VIPicklable
+    """Metaclass for VIPicklable.
 
     This metaclass is aimed to be used with VIPicklable class. It add the functionality
     to inherit attributes from the parent classes. Which is usefull for adding or
@@ -21,8 +25,9 @@ class MetaVIPicklable(type):
     """
 
     def __new__(cls, name: str, parents: tuple, attributes: dict):
-        """Metaclass constructor for CONFIG_ITEMS and PICKLE_BLACKLIST construction of
-        VIPicklables classes
+        """Metaclass constructor.
+
+        Construct CONFIG_ITEMS and PICKLE_BLACKLIST.
 
         Args:
             name (str): Name of the class
@@ -63,6 +68,12 @@ class MetaVIPicklable(type):
 
 
 class VIPicklable(metaclass=MetaVIPicklable):
+    """VIPicklable main class.
+
+    Inherit from this class and define attributes to blacklist and the ones to add to
+    the object configuration dict.
+    """
+
     PICKLE_NAME: str = "archive.pkl"
     PICKLE_BLACKLIST: Iterable[str] = ()
     PICKLE_BLACKLIST_ADD: Iterable[str] = ()
@@ -75,7 +86,7 @@ class VIPicklable(metaclass=MetaVIPicklable):
 
     @property
     def configurations(self) -> dict:
-        """A configuration dict used to show important attributes
+        """A configuration dict used to show important attributes.
 
         Returns:
             dict: configuration dict
@@ -85,7 +96,7 @@ class VIPicklable(metaclass=MetaVIPicklable):
         }
 
     def __getstate__(self):
-        """Pickle all attributes except the ones listed in PICKLE_BLACKLIST"""
+        """Pickle all attributes except the ones listed in PICKLE_BLACKLIST."""
         return {
             attribute: state
             for attribute, state in self.__dict__.items()
@@ -99,7 +110,7 @@ class VIPicklable(metaclass=MetaVIPicklable):
         json_dump_kwargs: dict = None,
         overwrite: bool = True,
     ):
-        """Save the object instance in a dedicated directory
+        """Save the object instance in a dedicated directory.
 
         Args:
             path (Union[str, Path]): Path to the directory
@@ -128,17 +139,18 @@ class VIPicklable(metaclass=MetaVIPicklable):
         self.after_save()
 
     def before_save(self):
-        """Hook executed at the beggining of the save method"""
+        """Hook executed at the beggining of the save method."""
 
     def after_save(self):
-        """Hook executed at the end of the save method"""
+        """Hook executed at the end of the save method."""
 
     def save_instance(self, path: Union[str, Path], overwrite: bool = True, **kwargs):
-        """Save the current instance
+        """Save the current instance.
 
         Args:
             path (Union[str, Path]): path to a folder where to save the current instance
             overwrite (bool, optional): If True, overwrite the folder if it exists.
+            kwargs (dict, optional): Additional parameters. Default to {}.
         """
         if not self.PICKLE_NAME:
             logger.info(
@@ -161,7 +173,7 @@ class VIPicklable(metaclass=MetaVIPicklable):
         option: Optional[int] = orjson.OPT_INDENT_2,
         default: Optional[Callable[[Any], Any]] = ...,
     ):
-        """Save the instance configuration attributes
+        """Save the instance configuration attributes.
 
         Args:
             path (Union[str, Path]): path to a folder where to save the current instance
@@ -170,6 +182,10 @@ class VIPicklable(metaclass=MetaVIPicklable):
             option (int, optional): ORJson options.
                 See [orjson documentation](https://github.com/ijl/orjson).
                 Defaults to orjson.OPT_INDENT_2.
+            default (Callable): To serialize a subclass or arbitrary types, specify
+                default as a callable that returns a supported type. default may be a
+                function, lambda, or callable class instance. To specify that a type was
+                not handled by default, raise an exception such as TypeError.
         """
         if not self.CONFIG_NAME:
             logger.info(
@@ -190,7 +206,7 @@ class VIPicklable(metaclass=MetaVIPicklable):
     def save_pickle_blacklisted(
         self, path: Union[str, Path], overwrite: bool = True
     ) -> Dict[str, Exception]:
-        """Try to save excluded attributes
+        """Try to save excluded attributes.
 
         Args:
             path (Union[str, Path]): path to a folder where to save blacklisted
@@ -228,11 +244,14 @@ class VIPicklable(metaclass=MetaVIPicklable):
 
     @classmethod
     def load_instance(cls, path: Union[str, Path], **kwargs) -> "VIPicklable":
-        """Load a VIPicklable instance and all loadable attributes from
-        a file or folder
+        """Load a VIPicklable instance.
+
+        Load an instance from a file or folder without unpicklable attributes.
 
         Args:
             path (Union[str, Path]): Path to the pickle file
+            kwargs (dict, optional): Additional parameters. Default to {}.
+
         Raises:
             FileNotFoundError: Pickle file not found
         Returns:
@@ -246,13 +265,16 @@ class VIPicklable(metaclass=MetaVIPicklable):
         cls,
         path: Union[str, Path],
         pickle_dump_kwargs: dict = None,
-        json_dump_kwargs: dict = None,
     ) -> "VIPicklable":
-        """Load a VIPicklable instance and all loadable attributes from
-        a file or folder
+        """Load a VIPicklable instance.
+
+        Load a VIPicklable instance and all loadable attributes from a file or folder.
 
         Args:
             path (Union[str, Path]): Path to the pickle file
+            pickle_dump_kwargs (dict, optional): additionnal arguments to be pass to
+                load_instance method. Default to None.
+
         Raises:
             FileNotFoundError: Pickle file not found
         Returns:
@@ -263,9 +285,6 @@ class VIPicklable(metaclass=MetaVIPicklable):
 
         if pickle_dump_kwargs is None:
             pickle_dump_kwargs = {}
-
-        if json_dump_kwargs is None:
-            json_dump_kwargs = {}
 
         if path.is_dir():
             pickle_path = path / cls.PICKLE_NAME
@@ -286,14 +305,14 @@ class VIPicklable(metaclass=MetaVIPicklable):
 
     @classmethod
     def before_load(cls):
-        """Hook executed at the beggining of the load method"""
+        """Hook executed at the beggining of the load method."""
 
     @classmethod
     def after_load(cls):
-        """Hook executed at the end of the load method"""
+        """Hook executed at the end of the load method."""
 
     def load_pickle_blacklisted(self, path: Union[str, Path]) -> Dict[str, Exception]:
-        """Try to unpickle excluded attributes
+        """Try to unpickle excluded attributes.
 
         Args:
             path (Union[str, Path]): Path to the pickle file
