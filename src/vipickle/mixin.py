@@ -1,12 +1,12 @@
-import json
 import pickle
 from pathlib import Path
-from typing import Dict, Iterable, Union
+from typing import Any, Callable, Dict, Iterable, Optional, Union
 
+import orjson
 from loguru import logger
 
 from .errors import DumpAttributeError, RestoreAttributeError
-from .save_utils import NumpyJSONEncoder, create_folder
+from .save_utils import create_folder
 
 DUMP_METHOD_PATTERN = "_dump_{}_"
 RESTORE_METHOD_PATTERN = "_restore_{}_"
@@ -158,9 +158,8 @@ class Archivable(metaclass=MetaArchivable):
         self,
         path: Union[str, Path],
         overwrite: bool = True,
-        indent: int = 2,
-        cls: json.JSONEncoder = NumpyJSONEncoder,
-        **kwargs,
+        option: Optional[int] = orjson.OPT_INDENT_2,
+        default: Optional[Callable[[Any], Any]] = ...,
     ):
         """Save the instance configuration attributes
 
@@ -168,9 +167,9 @@ class Archivable(metaclass=MetaArchivable):
             path (Union[str, Path]): path to a folder where to save the current instance
                 config file
             overwrite (bool, optional): If True, overwrite the folder if it exists.
-            indent (int, optional): JSON indentation. Defaults to 2.
-            cls (JSONEncoder, optional): JSON encoder object.
-                Defaults to NumpyJSONEncoder.
+            option (int, optional): ORJson options.
+                See [orjson documentation](https://github.com/ijl/orjson).
+                Defaults to orjson.OPT_INDENT_2.
         """
         if not self.CONFIG_NAME:
             logger.info(
@@ -183,8 +182,10 @@ class Archivable(metaclass=MetaArchivable):
         filepath = path / self.CONFIG_NAME
 
         if overwrite or not filepath.exists():
-            with open(filepath, "w") as f:
-                json.dump(self.configurations, f, indent=indent, cls=cls, **kwargs)
+            with open(filepath, "wb") as f:
+                f.write(
+                    orjson.dumps(self.configurations, default=default, option=option)
+                )
 
     def save_pickle_blacklisted(
         self, path: Union[str, Path], overwrite: bool = True
