@@ -23,19 +23,19 @@ theme:
           primary: amber
     features:
         - content.code.annotate
+        - navigation.tabs
+        - navigation.top
 
 nav:
-    - Home: index.md
+    - Overview: index.md
+    - Features:
+          - Blacklisting: features/blacklist.md
+          - Saving: features/saving.md
+          - Loading: features/loading.md
+          - Config file: features/config.md
+    - Example:
+          - Pytorch model wrapper: examples/pytorch.md
     - Code Reference: reference/
-
-extra:
-    alternate:
-        - name: English
-          link: /
-          lang: en
-        - name: Français
-          link: /fr/
-          lang: fr
 
 plugins:
     - search
@@ -53,10 +53,18 @@ plugins:
                       show_docstring_attributes: true
 
 markdown_extensions:
+    - admonition
+    - pymdownx.details
     - pymdownx.highlight:
           anchor_linenums: true
           line_spans: __span
           pygments_lang_class: true
     - pymdownx.inlinehilite
     - pymdownx.snippets
-    - pymdownx.superfences
+    - pymdownx.tasklist:
+          custom_checkbox: true
+    - pymdownx.superfences:
+          custom_fences:
+              - name: mermaid
+                class: mermaid
+                format: !!python/name:pymdownx.superfences.fence_code_format

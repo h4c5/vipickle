@@ -2,70 +2,86 @@
 
 vipickle is tiny python package for saving instances with unpickable attributes and restore them later.
 
-## Quickstart
+## Installation
 
-Install `vipickle` with pip :
+Install [`vipickle`](https://pypi.org/project/vipickle/) with pip :
 
 ```bash
 pip install vipickle
 ```
 
-Then inherit from `VIPicklable` and define which attribute are not picklable and how they should be dumped and restored.
+## Quickstart
+
+Inherit from `VIPicklable` to add saving and reloading capabilites to yours objects even if they have unpickable
+attributes.
 
 ```python
-import torch
-from torchvision import models
-from pathlib import Path
-
 from vipickle import VIPicklable
 
 class MyClass(VIPicklable):
-    PICKLE_BLACKLIST = ["vision_model"]
+    PICKLE_BLACKLIST = ["unpicklable_attribute"]
 
     def __init__(self):
-        self.vision_model = models.vgg16(weights='IMAGENET1K_V1')
+        self.unpicklable_attribute = "do_not_pickle"
 
-    def _dump_vision_model_(self, save_dir: Path, overwrite:bool = True):
-        model_weights_path = save_dir / "model_weights.pth"
-        if overwrite or not model_weights_path.exists():
-            torch.save(model.state_dict(), model_weights_path)
+    def _dump_unpicklable_attribute_(self, save_dir: Path, overwrite:bool = True):
+        print("unpicklable_attribute won't be pickled but we could have saved it another way")
 
-    def _restore_vision_model_(self, save_dir: Path):
-        self.vision_model = models.vgg16()
-        self.vision_model.load_state_dict(torch.load(save_dir / "model_weights.pth"))
+    def _restore_unpicklable_attribute_(self, save_dir: Path):
+        self.unpicklable_attribute = "attribute_restored"
 
 
 # Create an instance
 obj = Myclass()
+assert obj.unpicklable_attribute == "do_not_pickle"
 
-# train could modify the model weights
-obj.train()
-
-# we save the instance to a folder, _dump_vision_model_ will dump the weights in the folder
+# Save it : _dump_unpicklable_attribute_ will print a message
 obj.save("a/folder")
 del obj
 
-# we can then reload the object, _restore_vision_model_ will recreate the attribute vision_model and load the weights
+# Reload the object instance : _restore_unpicklable_attribute_ will set unpicklable_attribute
 obj = MyClass.load("a/folder")
-obj.vision_model.eval()
+assert obj.unpicklable_attribute == "attribute_restored"
 ```
 
-## Additionnal dependencies
+## Features
 
-#### Dev dependencies
+-   Blacklist of attributes that should not be pickled
+-   Dumping methods for blacklisted attributes
+-   Loading methods for blacklisted attributes
+-   List of attributes to be saved in a JSON file
+-   Blacklist inheritance
+
+See [Features](features/blacklist/) section for more details
+
+## Development
+
+Clone the repository and create a virtual environement
 
 ```bash
+git clone https://github.com/h4c5/vipickle
+cd vipickle
+python -m venv .venv
+```
+
+Activate the virtual environment and install dev dependencies :
+
+```bash
+source .venv/bin/activate
 pip install vipickle[dev]
 ```
 
-#### Unit tests dependencies
+Make modifications.
 
-```bash
-pip install vipickle[test]
-```
-
-#### Documentation dependencies
+To build the documentation, first install the documentation dependencies :
 
 ```bash
 pip install vipickle[doc]
+```
+
+Then :
+
+```bash
+mkdocs serve # for local serving
+mkdocs build # to build documentation
 ```
