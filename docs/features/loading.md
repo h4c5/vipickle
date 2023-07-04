@@ -1,7 +1,7 @@
 ## Loading an VIPicklable object
 
-[`VIPicklable`](/reference/vipickle/mixin/#vipickle.mixin.VIPicklable) objects have a
-[`load method`](/reference/vipickle/mixin/#vipickle.mixin.VIPicklable.load) for loading an object instance :
+[`VIPicklable`](/vipickle/reference/vipickle/mixin/#vipickle.mixin.VIPicklable) objects have a
+[`load method`](/vipickle/reference/vipickle/mixin/#vipickle.mixin.VIPicklable.load) for loading an object instance :
 
 ```pycon
 >>> class MyClass(VIPicklable):

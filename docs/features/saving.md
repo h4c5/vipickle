@@ -1,7 +1,7 @@
 ## Saving a VIPicklable object
 
-[`VIPicklable`](/reference/vipickle/mixin/#vipickle.mixin.VIPicklable) objects have a
-[`save method`](/reference/vipickle/mixin/#vipickle.mixin.VIPicklable.save) for saving an object instance :
+[`VIPicklable`](/vipickle/reference/vipickle/mixin/#vipickle.mixin.VIPicklable) objects have a
+[`save method`](/vipickle/reference/vipickle/mixin/#vipickle.mixin.VIPicklable.save) for saving an object instance :
 
 ```pycon
 >>> class MyClass(VIPicklable):
