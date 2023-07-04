@@ -8,6 +8,8 @@ on:
         branches:
             - "main"
             - "*mkdocs*"
+            
+    workflow_dispatch:
 permissions:
     contents: write
 jobs:
