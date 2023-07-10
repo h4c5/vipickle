@@ -11,7 +11,7 @@
 </div>
 
 <div align="center">
-    <h1>👑 VIPpickle</h1>
+    <h1>👑 VIPickle</h1>
     <p ><b>Tiny python package for saving instances with unpickable attributes</b></p>
 </div>
 
