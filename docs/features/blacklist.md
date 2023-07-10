@@ -59,3 +59,7 @@ class MySubSubClass(MySubClass):
     def __init__(self):
         super(MySubSubClass, self).__init__()
 ```
+
+!!! warning
+    If `PICKLE_BLACKLIST` is present, neither `PICKLE_BLACKLIST_ADD` nor `PICKLE_BLACKLIST_REMOVE` will be taken into
+    account
